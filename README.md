@@ -10,3 +10,4 @@ an example of calling the module.
 ## Change Log
 
 * 1.0.0 - Initial version
+* 1.1.0 - Support data disks

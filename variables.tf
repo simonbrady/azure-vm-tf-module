@@ -8,6 +8,12 @@ variable "allowed_cidr" {
   description = "CIDR range to allow SSH from"
 }
 
+variable "data_disk_sizes" {
+  type        = list(number)
+  default     = []
+  description = "Sizes of data disks to attach, in GB"
+}
+
 variable "location" {
   type        = string
   description = "Location to create resources in"
