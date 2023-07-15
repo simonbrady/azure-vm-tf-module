@@ -1,33 +1,3 @@
-resource "azurerm_network_security_group" "nsg" {
-  name                = "${var.prefix}-nsg"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-
-  security_rule {
-    name                       = "allow-ssh"
-    priority                   = 100
-    direction                  = "Inbound"
-    protocol                   = "Tcp"
-    source_address_prefixes    = [var.allowed_cidr]
-    source_port_range          = "*"
-    destination_address_prefix = "*"
-    destination_port_range     = 22
-    access                     = "Allow"
-  }
-
-  security_rule {
-    name                       = "deny-others"
-    priority                   = 4000
-    direction                  = "Inbound"
-    protocol                   = "*"
-    source_address_prefix      = "*"
-    source_port_range          = "*"
-    destination_address_prefix = "*"
-    destination_port_range     = "*"
-    access                     = "Deny"
-  }
-}
-
 resource "azurerm_public_ip" "pip" {
   count               = var.vm_count
   name                = format("${var.prefix}-pip%02d", count.index)
@@ -53,7 +23,7 @@ resource "azurerm_network_interface" "nic" {
 resource "azurerm_network_interface_security_group_association" "assoc" {
   count                     = var.vm_count
   network_interface_id      = azurerm_network_interface.nic[count.index].id
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  network_security_group_id = var.network_security_group_id
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {
@@ -64,6 +34,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   size                  = var.vm_size
   admin_username        = var.admin_user
   network_interface_ids = [azurerm_network_interface.nic[count.index].id]
+  custom_data           = var.custom_data
 
   admin_ssh_key {
     username   = var.admin_user

@@ -3,9 +3,10 @@ variable "admin_user" {
   description = "Username of VM admin"
 }
 
-variable "allowed_cidr" {
+variable "custom_data" {
   type        = string
-  description = "CIDR range to allow SSH from"
+  default     = null
+  description = "Base64-encoded data to process with cloud-init"
 }
 
 variable "data_disk_sizes" {
@@ -17,6 +18,11 @@ variable "data_disk_sizes" {
 variable "location" {
   type        = string
   description = "Location to create resources in"
+}
+
+variable "network_security_group_id" {
+  type        = string
+  description = "ID of network security group to associate with each NIC"
 }
 
 variable "plan" {
