@@ -26,15 +26,23 @@ resource "azurerm_network_interface_security_group_association" "assoc" {
   network_security_group_id = var.network_security_group_id
 }
 
+resource "azurerm_availability_set" "avset" {
+  name                        = "${var.prefix}-avset"
+  location                    = var.location
+  resource_group_name         = var.resource_group_name
+  platform_fault_domain_count = var.fault_domain_count
+}
+
 resource "azurerm_linux_virtual_machine" "vm" {
   count                 = var.vm_count
   name                  = format("${var.prefix}-vm%02d", count.index)
   location              = var.location
   resource_group_name   = var.resource_group_name
-  size                  = var.vm_size
   admin_username        = var.admin_user
-  network_interface_ids = [azurerm_network_interface.nic[count.index].id]
+  availability_set_id   = azurerm_availability_set.avset.id
   custom_data           = var.custom_data
+  network_interface_ids = [azurerm_network_interface.nic[count.index].id]
+  size                  = var.vm_size
 
   admin_ssh_key {
     username   = var.admin_user

@@ -12,3 +12,4 @@ an example of calling the module.
 * 1.0.0 - Initial version
 * 1.1.0 - Support data disks
 * 2.0.0 - Require caller to provide NSG; support VM custom data
+* 2.0.1 - Create VMs in availability set

@@ -15,6 +15,12 @@ variable "data_disk_sizes" {
   description = "Sizes of data disks to attach, in GB"
 }
 
+variable "fault_domain_count" {
+  type        = number
+  default     = 3
+  description = "Number of fault domains in selected location"
+}
+
 variable "location" {
   type        = string
   description = "Location to create resources in"
