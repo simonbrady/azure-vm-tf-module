@@ -3,6 +3,12 @@ variable "admin_user" {
   description = "Username of VM admin"
 }
 
+variable "create_load_balancer" {
+  type        = bool
+  default     = false
+  description = "Whether to create a load balancer in front of the VMs"
+}
+
 variable "custom_data" {
   type        = string
   default     = null

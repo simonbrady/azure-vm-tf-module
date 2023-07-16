@@ -1,4 +1,12 @@
-resource "azurerm_public_ip" "pip" {
+# Static values referred to in multiple places
+locals {
+  nic_ip_config   = "primary"
+  lb_fe_ip_config = "frontend_public"
+}
+
+# VM config
+
+resource "azurerm_public_ip" "vm" {
   count               = var.vm_count
   name                = format("${var.prefix}-pip%02d", count.index)
   location            = var.location
@@ -13,10 +21,10 @@ resource "azurerm_network_interface" "nic" {
   resource_group_name = var.resource_group_name
 
   ip_configuration {
-    name                          = "primary"
+    name                          = local.nic_ip_config
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pip[count.index].id
+    public_ip_address_id          = azurerm_public_ip.vm[count.index].id
   }
 }
 
@@ -113,4 +121,39 @@ resource "azurerm_virtual_machine_data_disk_attachment" "example" {
   virtual_machine_id = each.value.vm_id
   lun                = each.value.lun
   caching            = "ReadWrite"
+}
+
+# Load balancer config
+
+resource "azurerm_public_ip" "lb" {
+  count               = var.create_load_balancer ? 1 : 0
+  name                = "${var.prefix}-lb-pip"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  allocation_method   = "Static"
+}
+
+resource "azurerm_lb" "lb" {
+  count               = var.create_load_balancer ? 1 : 0
+  name                = "${var.prefix}-lb"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+  frontend_ip_configuration {
+    name                 = local.lb_fe_ip_config
+    public_ip_address_id = azurerm_public_ip.lb[0].id
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "backend" {
+  count           = var.create_load_balancer ? 1 : 0
+  name            = "${var.prefix}-lb-beap"
+  loadbalancer_id = azurerm_lb.lb[0].id
+}
+
+resource "azurerm_network_interface_backend_address_pool_association" "assoc" {
+  count                   = var.create_load_balancer ? var.vm_count : 0
+  network_interface_id    = azurerm_network_interface.nic[count.index].id
+  ip_configuration_name   = local.nic_ip_config
+  backend_address_pool_id = azurerm_lb_backend_address_pool.backend[0].id
 }
