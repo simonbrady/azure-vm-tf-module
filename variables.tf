@@ -3,6 +3,12 @@ variable "admin_user" {
   description = "Username of VM admin"
 }
 
+variable "assign_public_ip" {
+  type        = bool
+  default     = true
+  description = "Whether to assign public IPs to the VMs"
+}
+
 variable "create_load_balancer" {
   type        = bool
   default     = false

@@ -7,7 +7,7 @@ locals {
 # VM config
 
 resource "azurerm_public_ip" "vm" {
-  count               = var.vm_count
+  count               = var.assign_public_ip ? var.vm_count : 0
   name                = format("${var.prefix}-pip%02d", count.index)
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -24,7 +24,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = local.nic_ip_config
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.vm[count.index].id
+    public_ip_address_id          = var.assign_public_ip ? azurerm_public_ip.vm[count.index].id : null
   }
 }
 

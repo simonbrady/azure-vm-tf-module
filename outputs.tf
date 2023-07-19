@@ -15,5 +15,5 @@ output "lb_public_ip" {
 }
 
 output "vm_public_ips" {
-  value = zipmap(azurerm_linux_virtual_machine.vm[*].name, azurerm_public_ip.vm[*].ip_address)
+  value = var.assign_public_ip ? zipmap(azurerm_linux_virtual_machine.vm[*].name, azurerm_public_ip.vm[*].ip_address) : null
 }
