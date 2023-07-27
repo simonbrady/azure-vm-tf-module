@@ -43,6 +43,12 @@ variable "network_security_group_id" {
   description = "ID of network security group to associate with each NIC"
 }
 
+variable "os_disk_size" {
+  type        = number
+  default     = null
+  description = "Size of persistent OS disk in GB, overrides image default if set"
+}
+
 variable "plan" {
   type        = map(string)
   description = "Values for VM plan block"
