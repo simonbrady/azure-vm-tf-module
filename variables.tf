@@ -27,10 +27,40 @@ variable "data_disk_sizes" {
   description = "Sizes of data disks to attach, in GB"
 }
 
+variable "dns_private_zone_name" {
+  type        = string
+  default     = null
+  description = "Name of DNS zone to create private IP A records in"
+}
+
+variable "dns_public_zone_name" {
+  type        = string
+  default     = null
+  description = "Name of DNS zone to create public IP A records in"
+}
+
+variable "dns_resource_group_name" {
+  type        = string
+  default     = null
+  description = "Resource group containing public and private DNS zones"
+}
+
+variable "dns_ttl" {
+  type        = number
+  default     = 300
+  description = "Time-to-live in seconds for DNS records"
+}
+
 variable "fault_domain_count" {
   type        = number
   default     = 3
   description = "Number of fault domains in selected location"
+}
+
+variable "load_balancer_dns_name" {
+  type        = string
+  default     = null
+  description = "Custom public DNS name for load balancer, overrides default if set"
 }
 
 variable "location" {

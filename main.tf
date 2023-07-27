@@ -4,7 +4,7 @@ locals {
   lb_fe_ip_config = "frontend_public"
 }
 
-# VM config
+# Network config
 
 resource "azurerm_public_ip" "vm" {
   count               = var.assign_public_ip ? var.vm_count : 0
@@ -33,6 +33,8 @@ resource "azurerm_network_interface_security_group_association" "assoc" {
   network_interface_id      = azurerm_network_interface.nic[count.index].id
   network_security_group_id = var.network_security_group_id
 }
+
+# VM config
 
 resource "azurerm_availability_set" "avset" {
   name                        = "${var.prefix}-avset"
@@ -157,4 +159,33 @@ resource "azurerm_network_interface_backend_address_pool_association" "assoc" {
   network_interface_id    = azurerm_network_interface.nic[count.index].id
   ip_configuration_name   = local.nic_ip_config
   backend_address_pool_id = azurerm_lb_backend_address_pool.backend[0].id
+}
+
+# DNS config
+
+resource "azurerm_dns_a_record" "lb" {
+  count               = (var.create_load_balancer && var.dns_public_zone_name != null) ? 1 : 0
+  name                = var.load_balancer_dns_name == null ? "${var.prefix}-lb" : var.load_balancer_dns_name
+  zone_name           = var.dns_public_zone_name
+  resource_group_name = var.dns_resource_group_name
+  ttl                 = var.dns_ttl
+  records             = [azurerm_public_ip.lb[0].ip_address]
+}
+
+resource "azurerm_dns_a_record" "private" {
+  count               = var.dns_private_zone_name == null ? 0 : var.vm_count
+  name                = format("${var.prefix}-vm%02d", count.index)
+  zone_name           = var.dns_private_zone_name
+  resource_group_name = var.dns_resource_group_name
+  ttl                 = var.dns_ttl
+  records             = [azurerm_linux_virtual_machine.vm[count.index].private_ip_address]
+}
+
+resource "azurerm_dns_a_record" "public" {
+  count               = var.dns_public_zone_name == null ? 0 : var.vm_count
+  name                = format("${var.prefix}-vm%02d", count.index)
+  zone_name           = var.dns_public_zone_name
+  resource_group_name = var.dns_resource_group_name
+  ttl                 = var.dns_ttl
+  records             = [azurerm_linux_virtual_machine.vm[count.index].public_ip_address]
 }

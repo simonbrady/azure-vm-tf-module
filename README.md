@@ -15,3 +15,4 @@ an example of calling the module.
 * 2.0.1 - Create VMs in availability set
 * 2.1.0 - Support optional load balancer
 * 2.2.0 - Make public IP assignment optional
+* 2.3.0 - Support DNS and setting OS disk size
