@@ -77,7 +77,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 
   dynamic "plan" {
-    for_each = [var.plan]
+    for_each = (length(var.plan) == 0 ? [] : [var.plan])
     content {
       name      = plan.value.name
       publisher = plan.value.publisher

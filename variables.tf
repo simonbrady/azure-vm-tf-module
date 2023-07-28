@@ -81,6 +81,7 @@ variable "os_disk_size" {
 
 variable "plan" {
   type        = map(string)
+  default     = {}
   description = "Values for VM plan block"
 }
 
